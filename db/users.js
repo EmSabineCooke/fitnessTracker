@@ -10,7 +10,7 @@ async function createUser({ username, password }) {
       VALUES ($1, $2)
       ON CONFLICT(username) DO NOTHING
       RETURNING *;
-    `, username, password);
+    `, [username, password]);
     return rows;
   } catch (err) {
     throw err;
