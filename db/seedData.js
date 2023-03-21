@@ -1,5 +1,5 @@
 // require in the database adapter functions as you write them (createUser, createActivity...)
-// const { } = require('./');
+const { createUser } = require("./index");
 const client = require("./client")
 
 async function dropTables() {
@@ -49,6 +49,7 @@ async function createTables() {
         count INTEGER
       );
     `);
+    console.log("Tables built!");
   } catch (err) {
     console.error("Error creating tables");
     throw err;
