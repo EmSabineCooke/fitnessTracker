@@ -1,12 +1,12 @@
 // require in the database adapter functions as you write them (createUser, createActivity...)
-const { createUser } = require("./index");
+const { createUser, createActivity, createRoutine, getRoutinesWithoutActivities, getAllActivities  } = require("./index");
 const client = require("./client")
 
 async function dropTables() {
   console.log("Dropping All Tables...")
   try {
     await client.query(`
-      DROP TABLE IF EXISTS routineactivities;
+      DROP TABLE IF EXISTS "routine_activities";
       DROP TABLE IF EXISTS routines;
       DROP TABLE IF EXISTS activities;
       DROP TABLE IF EXISTS users;
@@ -41,7 +41,7 @@ async function createTables() {
         goal TEXT NOT NULL
       );
 
-      CREATE TABLE routineactivities (
+      CREATE TABLE "routine_activities" (
         id SERIAL PRIMARY KEY,
         "routineId" INTEGER REFERENCES routines(id),
         "activityId" INTEGER REFERENCES activities(id),
