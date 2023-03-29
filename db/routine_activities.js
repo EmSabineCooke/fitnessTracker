@@ -8,11 +8,11 @@ async function addActivityToRoutine({
   duration,
 }) {
 try {
-  const { row: [activity] } = await client.query(`
+  const { rows: [ activity ] } = await client.query(`
     INSERT INTO "routine_activities" ("routineId", "activityId", duration, count)
     VALUES ($1, $2, $3, $4)
     RETURNING *;
-  `, [routineId, activityId, count, duration]);
+  `, [routineId, activityId, duration, count]);
   return activity;
 } catch (error) {
   throw error; 
@@ -49,6 +49,7 @@ async function getRoutineActivitiesByRoutine({ id }) {
 async function updateRoutineActivity({ id, ...fields }) {
   try {
     if (fields.duration) {
+      console.log("DURATION", fields.duration);
       client.query(`
         UPDATE "routine_activities"
         SET duration=$1
@@ -57,6 +58,7 @@ async function updateRoutineActivity({ id, ...fields }) {
     }
 
     if (fields.count) {
+      console.log("COUNT", fields.count);
       client.query(`
       UPDATE "routine_activities"
       SET count=$1
