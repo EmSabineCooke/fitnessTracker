@@ -49,8 +49,7 @@ async function getRoutineActivitiesByRoutine({ id }) {
 async function updateRoutineActivity({ id, ...fields }) {
   try {
     if (fields.duration) {
-      console.log("DURATION", fields.duration);
-      client.query(`
+      await client.query(`
         UPDATE "routine_activities"
         SET duration=$1
         WHERE id=$2;
@@ -58,8 +57,7 @@ async function updateRoutineActivity({ id, ...fields }) {
     }
 
     if (fields.count) {
-      console.log("COUNT", fields.count);
-      client.query(`
+      await client.query(`
       UPDATE "routine_activities"
       SET count=$1
       WHERE id=$2;
