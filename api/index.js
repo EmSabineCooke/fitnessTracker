@@ -2,8 +2,6 @@ const express = require('express');
 const router = express.Router();
 
 // GET /api/health
-router.get('/health', async (req, res, next) => {
-});
 
 // ROUTER: /api/users
 const usersRouter = require('./users');
@@ -21,4 +19,8 @@ router.use('/routines', routinesRouter);
 const routineActivitiesRouter = require('./routineActivities');
 router.use('/routine_activities', routineActivitiesRouter);
 
+
+
 module.exports = router;
+
+
