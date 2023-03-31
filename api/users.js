@@ -1,7 +1,7 @@
 /* eslint-disable no-useless-catch */
 const express = require("express");
 const router = express.Router();
-const { createUser, getUserByUsername } = require("../db/users");
+const { createUser, getUserByUsername, getUserById } = require("../db/users");
 const jwt = require('jsonwebtoken');
 const { JWT_SECRET } = process.env;
 const bcrypt = require("bcrypt");
@@ -75,6 +75,26 @@ router.post('/login', async (req, res, next) => {
 });
 
 // GET /api/users/me
+
+router.get('/me', async (req, res, next) => {
+    const prefix = 'Bearer ';
+    const auth = req.header('authorization');
+    if(!auth) {
+        res.status(401).send({error: "NotLoggedIn", message: "You must be logged in to perform this action", name: "NotLoggedInError"});
+    } else if(auth.startsWith(prefix)) {
+        const token = auth.slice(prefix.length);
+        const { id } =  jwt.verify(token, JWT_SECRET);
+        console.log("DECODED", id);
+        if (id) {
+            try {
+                const me = await getUserById(id);
+                res.send(me);
+            } catch ({name, message}) {
+                next({name, message});
+            }
+    }
+}
+});
 
 // GET /api/users/:username/routines
 
