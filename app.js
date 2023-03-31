@@ -1,10 +1,15 @@
 require("dotenv").config()
 const express = require("express")
 const app = express()
-const PORT = process.env.PORT || 3000;
+const cors = require('cors');
+const PORT = process.env.PORT || 4000;
 
 const apiRouter = require("./api")
-app.use("/api", apiRouter)
+
+app.use(cors());
+app.use(express.json());
+
+
 // Setup your Middleware and API Router here
 
 app.get('/', (req, res) => {
@@ -12,11 +17,10 @@ app.get('/', (req, res) => {
   res.end();
 })
 
-app.listen(PORT, (err) => {
-  if (err) console.log('problem with server')
-  console.log(`listening on port ${PORT}`)
-})
+// app.listen(PORT, () => {
+//   console.log(`listening on port ${PORT}`);
+// })
 
-app.use(express.json());
+app.use("/api", apiRouter);
 
-module.exports = app;
+module.exports = app

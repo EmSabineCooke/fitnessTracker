@@ -62,7 +62,11 @@ async function getUserByUsername(userName) {
       SELECT * From users
       WHERE username=$1;
     `, [userName]);
-    return user;
+    if(user){
+      return user;
+    } else {
+      return false;
+    }
   } catch (error) {
     throw error;
   }
