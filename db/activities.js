@@ -22,6 +22,7 @@ async function getAllActivities() {
         FROM activities;
         `);
 
+<<<<<<<< < Temporary merge branch 1
     async function getActivityById(id) { }
 
     async function getActivityByName(name) { }
@@ -43,6 +44,13 @@ async function getAllActivities() {
       createActivity,
       updateActivity,
     };
+=========
+        return activities;
+  } catch (error) {
+    throw error;
+  }
+};
+>>>>>>>>> Temporary merge branch 2
 
 
     async function getActivityById(activityId) {
@@ -76,9 +84,17 @@ async function getAllActivities() {
     };
 
 
+<<<<<<<<< Temporary merge branch 1
     module.exports = {
       createActivity,
       getAllActivities,
       getActivityById,
       updateActivity
     }
+=========
+module.exports = {
+     createActivity,
+     getAllActivities,
+     getActivityById,
+     updateActivity }
+>>>>>>>>> Temporary merge branch 2
