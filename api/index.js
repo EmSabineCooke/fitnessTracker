@@ -2,6 +2,10 @@ const express = require('express');
 const router = express.Router();
 
 // GET /api/health
+router.get('/health', (req, res) => {
+  res.send('router is up!')
+})
+//is server up
 
 // ROUTER: /api/users
 const usersRouter = require('./users');
