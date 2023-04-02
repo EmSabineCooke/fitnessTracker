@@ -2,6 +2,7 @@
 const express = require("express");
 const router = express.Router();
 const { createUser, getUserByUsername, getUserById } = require("../db/users");
+const { getPublicRoutinesByUser, getAllRoutinesByUser } = require("../db/routines");
 const jwt = require('jsonwebtoken');
 const { JWT_SECRET } = process.env;
 const bcrypt = require("bcrypt");
@@ -84,7 +85,6 @@ router.get('/me', async (req, res, next) => {
     } else if(auth.startsWith(prefix)) {
         const token = auth.slice(prefix.length);
         const { id } =  jwt.verify(token, JWT_SECRET);
-        console.log("DECODED", id);
         if (id) {
             try {
                 const me = await getUserById(id);
@@ -97,5 +97,23 @@ router.get('/me', async (req, res, next) => {
 });
 
 // GET /api/users/:username/routines
+
+router.get('/:username/routines', async (req, res, next) => {
+    const prefix = 'Bearer ';
+    const auth = req.header('authorization');
+    const { username } = req.params;
+    console.log(username);
+    if(!auth) {
+        const result = await getPublicRoutinesByUser(username);
+        res.send(result);
+    } else {
+        const token = auth.slice(prefix.length);
+        const { id } =  jwt.verify(token, JWT_SECRET);
+        if(id) {
+            const response = await getAllRoutinesByUser(username);
+            res.send(response);
+        }
+    }
+})
 
 module.exports = router;

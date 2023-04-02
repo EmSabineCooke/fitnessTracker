@@ -138,8 +138,9 @@ async function getPublicRoutinesByUser({username}) {
         WHERE "routineId" IN ($1)
         `, [routine.id]);
         routine.activities = activities
+        console.log("ROUTINE", routine);
       }
-
+      console.log("ROUTINES", routines);
       return routines;
   } catch(error) {
     throw error;
