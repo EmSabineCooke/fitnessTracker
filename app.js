@@ -2,6 +2,31 @@ require("dotenv").config()
 const morgan = require('morgan');
 const express = require("express")
 const app = express()
+  <<<<<<<< < Temporary merge branch 1
+const cors = require('cors');
+const PORT = process.env.PORT || 4000;
+
+const apiRouter = require("./api")
+
+app.use(cors());
+app.use(express.json());
+
+
+// Setup your Middleware and API Router here
+
+app.get('/', (req, res) => {
+  res.send('Api router');
+  res.end();
+})
+
+// app.listen(PORT, () => {
+//   console.log(`listening on port ${PORT}`);
+// })
+
+app.use("/api", apiRouter);
+
+module.exports = app
+=========
 const PORT = process.env.PORT || 3000;
 const apiRouter = require("./api")
 app.use("/api", apiRouter)
@@ -24,6 +49,6 @@ app.use((err, req, res, next) => {
   })
 })
 
-
+app.use("/api", apiRouter);
 
 module.exports = app;
