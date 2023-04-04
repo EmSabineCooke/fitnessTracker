@@ -169,11 +169,11 @@ async function getPublicRoutinesByActivity({activityId}) {
         FROM routines
         JOIN users on routines."creatorId"=users.id
         WHERE "isPublic"=true;
-        `);
+        `)
    
       const updatedRoutines = await Promise.all(routines.map(async function(routine) {
-      const activitiesList = await getRoutineByRoutineId(routine.id); 
-      routine.activities = activitiesList;
+      const activitiesList = await getRoutineByRoutineId(routine.id) 
+      routine.activities = activitiesList
 
       await activitiesList.filter(async function(activity) {
       return activity.id === activityId
@@ -199,12 +199,10 @@ async function updateRoutine({ id, isPublic, name, goal }) {
   if(!goal) {
     delete fields.goal;
   }
-  console.log("FIELDS", fields);
 
   const setString = Object.keys(fields).map(
     (key, index) => `"${ key }"=$${ index + 1 }`
     ).join(', ');
-    console.log("String", setString);
 
   if (setString.length === 0) {
     return;

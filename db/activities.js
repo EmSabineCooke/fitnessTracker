@@ -28,18 +28,7 @@ async function getAllActivities() {
   }
 };
 
-
-    module.exports = {
-      getAllActivities,
-      getActivityById,
-      // getActivityByName,
-      // attachActivitiesToRoutines,
-      createActivity,
-      updateActivity,
-    };
-
-
-    async function getActivityById(activityId) {
+async function getActivityById(activityId) {
       try {
         const { rows: [activity] } = await client.query(`
         SELECT *
@@ -54,14 +43,29 @@ async function getAllActivities() {
     };
 
 
-    async function updateActivity({ id, name, description }) {
+async function updateActivity({ id, name, description }) {
+  let fields  = { name, description };
+  if(!name) {
+    delete fields.name;
+  } 
+  if(!description) {
+    delete fields.description;
+  }
+
+  const setString = Object.keys(fields).map(
+    (key, index) => `"${ key }"=$${ index + 1 }`
+    ).join(', ');
+
+  if (setString.length === 0) {
+    return;
+  }
       try {
         const { rows: [activity] } = await client.query(`
         UPDATE activities
-        SET name='${name}', description='${description}'
+        SET ${setString}
         WHERE id = ${id}
         RETURNING *;
-        `)
+        `, Object.values(fields));
 
         return activity;
       } catch (error) {
@@ -69,9 +73,23 @@ async function getAllActivities() {
       }
     };
 
+  async function getActivityByName(activityName) {
+    try { 
+      const { rows: [activity] } = await client.query(`
+        SELECT * FROM activities 
+        WHERE name=$1;
+      `, [activityName]);
+      return activity;
+      
+    } catch (error) {
+      throw error; 
+    }
+  }
+
 
 module.exports = {  
      createActivity,
      getAllActivities,
      getActivityById,
-     updateActivity }
+     updateActivity,
+    getActivityByName }
