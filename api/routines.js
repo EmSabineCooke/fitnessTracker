@@ -1,5 +1,7 @@
 const express = require('express');
 const routinesRouter = express.Router();
+const jwt = require('jsonwebtoken');
+const { JWT_SECRET } = process.env;
 const { getAllPublicRoutines,
   getAllRoutines,
       createRoutine,
@@ -7,7 +9,8 @@ const { getAllPublicRoutines,
       updateRoutine,
       destroyRoutine,
       getRoutineActivitiesByRoutineIdActivityIdPair,
-      addActivityToRoutine }  = require('../db/')
+      addActivityToRoutine, 
+      getUserById}  = require('../db/')
 
 const requireUser = require('./utils')   
 
@@ -22,23 +25,31 @@ routinesRouter.get('/', async (req, res, next) => {
 });
 
 
-routinesRouter.post('/', requireUser, async (req, res, next) => {
-  const { isPublic, name, goal } = req.body;
-  
-  try {
-    const newRoutine = await createRoutine({creatorId: req.user.id, isPublic, name, goal})
-
-    if (newRoutine) {
-      res.send(newRoutine);
-    } else {
-      next({ 
-      name: 'RoutineCreationError', 
-      message: 'Sorry, no routine created'
-      });
+routinesRouter.post('/', async (req, res, next) => {
+  const prefix = 'Bearer ';
+  const auth = req.header('authorization');
+  if(!auth) {
+    res.status(403);
+    res.send({error:"NotLoggedIn", name:"NotLoggedIn", message:"You must be logged in to perform this action"});
+  } else {
+    const token = auth.slice(prefix.length);
+    const { id } =  jwt.verify(token, JWT_SECRET);
+    const { isPublic, name, goal } = req.body;
+    const fields = {
+      creatorId: id,
+      isPublic: isPublic,
+      name: name,
+      goal: goal
     }
-  } catch ({ name, message }) {
+  try {
+    if(id) {
+      const newRoutine = await createRoutine(fields);
+      res.send(newRoutine);
+    } 
+    } catch ({ name, message }) {
     next({ name, message });
   }
+}
 });
 
 
@@ -64,24 +75,30 @@ routinesRouter.post('/:routineId/activities', async (req, res, next) => {
 });
 
 
-routinesRouter.patch('/:routineId', requireUser, async (req, res, next) => {
+routinesRouter.patch('/:routineId', async (req, res, next) => {
   const { routineId } = req.params;
   const { isPublic, name, goal } = req.body;
-
-  try {
-    const routine = await getRoutineById(routineId)
-
-    if (routine.creatorId === req.user.id) {
-      const updatedRoutine = await updateRoutine({id: routine.id, isPublic, name, goal})
-      res.send(updatedRoutine)
-    } else {
-      next({
-        name: 'UnauthorizedUserError',
-        message: 'You cannot update a routine that is not yours'
-      })
+  const prefix = 'Bearer ';
+  const auth = req.header('authorization');
+  if(!auth) {
+    res.status(403);
+    res.send({error:"NotLoggedIn", name:"NotLoggedIn", message:"You must be logged in to perform this action"});
+  } else {
+    const token = auth.slice(prefix.length);
+    const { id } =  jwt.verify(token, JWT_SECRET);
+    try {
+      const user = await getUserById(id);
+      const routine = await getRoutineById(routineId);
+      if(routine.creatorId === id) {
+        const result = await updateRoutine({id, isPublic, name, goal});
+        res.send(result);
+      } else {
+        res.status(403);
+        res.send({error: "UnathorizedChange", name: "UnauthorizedChange", message:`User ${user.username} is not allowed to update ${routine.name}`});
+      }
+    } catch (error) {
+      
     }
-  } catch ({ name, message }) {
-    next({ name, message });
   }
 });
 
