@@ -98,21 +98,18 @@ router.get('/me', async (req, res, next) => {
 
 // GET /api/users/:username/routines
 
-router.get('/:username/routines', async (req, res, next) => {
+router.get('/:username/routines', async (req, res) => {
     const prefix = 'Bearer ';
     const auth = req.header('authorization');
     const { username } = req.params;
-    console.log(username);
-    if(!auth) {
-        const result = await getPublicRoutinesByUser(username);
+    const token = auth.slice(prefix.length);
+    const { id } =  jwt.verify(token, JWT_SECRET);
+    if(!id) {
+        const result = await getPublicRoutinesByUser({ username });
         res.send(result);
     } else {
-        const token = auth.slice(prefix.length);
-        const { id } =  jwt.verify(token, JWT_SECRET);
-        if(id) {
-            const response = await getAllRoutinesByUser(username);
+            const response = await getAllRoutinesByUser({ username });
             res.send(response);
-        }
     }
 })
 
