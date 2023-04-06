@@ -126,8 +126,8 @@ routinesRouter.delete('/:routineId', async (req, res) => {
           res.status(403);
           res.send({error: "IncorrectUser", name: "IncorrectUser", message: `User ${user.username} is not allowed to delete ${routine.name}`});
         }
-    } catch (error) {
-      
+    } catch ({name, message}) {
+      next({name, message});
     }
   }
 });

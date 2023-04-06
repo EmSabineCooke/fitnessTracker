@@ -98,18 +98,28 @@ router.get('/me', async (req, res, next) => {
 
 // GET /api/users/:username/routines
 
-router.get('/:username/routines', async (req, res) => {
+router.get('/:username/routines', async (req, res, next) => {
+    const { username } = req.params;  
     const prefix = 'Bearer ';
     const auth = req.header('authorization');
-    const { username } = req.params;
-    const token = auth.slice(prefix.length);
-    const { id } =  jwt.verify(token, JWT_SECRET);
-    if(!id) {
-        const result = await getPublicRoutinesByUser({ username });
-        res.send(result);
+    if(!auth) {
+      res.status(403);
+      res.send({error:"NotLoggedIn", name:"NotLoggedIn", message:"You must be logged in to perform this action"});
     } else {
+      const token = auth.slice(prefix.length);
+      const { id } =  jwt.verify(token, JWT_SECRET);
+      try {
+        const user = await getUserByUsername(username);
+        if(user.id === id) {
             const response = await getAllRoutinesByUser({ username });
             res.send(response);
+        } else {
+            const response = await getPublicRoutinesByUser({ username });
+            res.send(response);
+        }
+      } catch ({name, message}) {
+        next({name, message});
+      }
     }
 })
 
