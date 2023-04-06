@@ -8,9 +8,9 @@ const { getAllPublicRoutines,
       getRoutineById,
       updateRoutine,
       destroyRoutine,
-      getRoutineActivitiesByRoutineIdActivityIdPair,
       addActivityToRoutine, 
-      getUserById}  = require('../db/')
+      getUserById,
+      getRoutineActivitiesByRoutine}  = require('../db/')
 
 const requireUser = require('./utils')   
 
@@ -55,19 +55,22 @@ routinesRouter.post('/', async (req, res, next) => {
 
 routinesRouter.post('/:routineId/activities', async (req, res, next) => {
   const { routineId } = req.params;
-  const { activityId, count, duration } = req.body
+  const { activityId, count, duration } = req.body;
 
   try { 
-    const existingPair = await getRoutineActivitiesByRoutineIdActivityIdPair(routineId, activityId)
-    const addedActivity =  await addActivityToRoutine({ routineId, activityId, count, duration })
-  
-    if (addedActivity && !existingPair) {
-      res.send(addedActivity);
+    const routineActExists = await getRoutineActivitiesByRoutine({id: routineId});
+    let exists = false;
+
+    for(let i = 0; i < routineActExists.length; i++) {
+      if (routineActExists[i].activityId === activityId) {
+        exists = true;
+      }
+    }
+    if(exists) {
+      res.send({error: "RoutineActivityDuplicate", name: "RoutineActivityDuplicate", message: `Activity ID ${activityId} already exists in Routine ID ${routineId}`});
     } else {
-      next({ 
-        name: 'AddActivityError', 
-        message: 'Sorry, no routine activity added'
-        });
+        const result = await addActivityToRoutine({routineId, activityId, count, duration});
+        res.send(result);
     }
   } catch ({ name, message }) {
     next({ name, message })
@@ -96,32 +99,36 @@ routinesRouter.patch('/:routineId', async (req, res, next) => {
         res.status(403);
         res.send({error: "UnathorizedChange", name: "UnauthorizedChange", message:`User ${user.username} is not allowed to update ${routine.name}`});
       }
-    } catch (error) {
-      
+    } catch ({name, message}) {
+      next({name, message});
     }
   }
 });
 
 
-routinesRouter.delete('/:routineId', requireUser, async (req, res, next) => {
+routinesRouter.delete('/:routineId', async (req, res) => {
   const { routineId } = req.params;  
-  const routine = await getRoutineById(routineId)
-
-  try {
-    if (routine && routine.creatorId === req.user.id) {
-      const removedRoutine = await destroyRoutine(routine.id)
-      res.send(removedRoutine);
-    } else {
-      next(routine ? { 
-      name: 'NotAllowed', 
-      message: 'Sorry it was not deleted because you are not the user'
-      } : { 
-      name: 'NotAvailable', 
-      message: 'That routine does not exist'
-      });
+  const prefix = 'Bearer ';
+  const auth = req.header('authorization');
+  if(!auth) {
+    res.status(403);
+    res.send({error:"NotLoggedIn", name:"NotLoggedIn", message:"You must be logged in to perform this action"});
+  } else {
+    const token = auth.slice(prefix.length);
+    const { id } =  jwt.verify(token, JWT_SECRET);
+    try {
+        const user = await getUserById(id);
+        const routine = await getRoutineById(routineId);
+        if(routine.creatorId === id) {
+        const result = await destroyRoutine(routineId);
+        res.send(result);
+        } else {
+          res.status(403);
+          res.send({error: "IncorrectUser", name: "IncorrectUser", message: `User ${user.username} is not allowed to delete ${routine.name}`});
+        }
+    } catch (error) {
+      
     }
-  } catch ({ name, message }) {
-    next({ name, message })
   }
 });
 
