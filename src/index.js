@@ -1,16 +1,14 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import React from "react";
-import ReactDOM from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";
 import { createRoot } from 'react-dom/client';
-import { HashRouter, Routes, Route } from "react-router-dom";
+import { HashRouter, Routes, Route } from "react-router";
 import HomeScreen from "./components/HomeScreen.js";
 import Register from "./components/Register.js";
 import Profile from "./components/Profile.js";
 import Login from "./components/Login.js";
 import Search from "./components/Search.js"
-import "./index.css";
+// import "./index.css";
 
 const App = () => {
   return (
