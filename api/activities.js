@@ -52,17 +52,14 @@ router.post('/', async (req, res, next) => {
   }
 });
 
-// PATCH /api/activities/:activityId
 router.patch('/:activityId', async (req, res, next) => {
   const { activityId } = req.params;
   const { name, description } = req.body;
 
   const updateFields = {};
-
   if (name) {
     updateFields.name = name;
   }
-
   if (description) {
     updateFields.description = description;
   }

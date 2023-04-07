@@ -22,7 +22,7 @@ async function getAllActivities() {
         FROM activities;
         `);
 
-        return activities;
+    return activities;
   } catch (error) {
     throw error;
   }
@@ -36,11 +36,11 @@ async function getActivityById(activityId) {
         WHERE id=$1;
         `, [activityId]);
 
-        return activity;
-      } catch (error) {
-        throw error;
-      }
-    };
+    return activity;
+  } catch (error) {
+    throw error;
+  }
+};
 
 
 async function updateActivity({ id, name, description }) {
@@ -67,11 +67,11 @@ async function updateActivity({ id, name, description }) {
         RETURNING *;
         `, Object.values(fields));
 
-        return activity;
-      } catch (error) {
-        throw error;
-      }
-    };
+    return activity;
+  } catch (error) {
+    throw error;
+  }
+};
 
   async function getActivityByName(activityName) {
     try { 
@@ -87,9 +87,10 @@ async function updateActivity({ id, name, description }) {
   }
 
 
-module.exports = {  
-     createActivity,
-     getAllActivities,
-     getActivityById,
-     updateActivity,
-    getActivityByName }
+module.exports = {
+  createActivity,
+  getAllActivities,
+  getActivityById,
+  updateActivity,
+    getActivityByName
+}
