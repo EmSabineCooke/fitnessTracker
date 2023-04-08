@@ -26,7 +26,6 @@ async function getRoutineActivityById(id) {
       SELECT * FROM "routine_activities"
       WHERE id=$1;
     `, [id]);
-    console.log(routineActivity);
     return routineActivity;
   } catch (error) {
     throw error;

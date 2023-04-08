@@ -1,10 +1,18 @@
 const express = require('express');
 const router = express.Router();
+const jwt = require('jsonwebtoken');
+const { JWT_SECRET } = process.env;
+const { getRoutineActivityById } = require('../db/routine_activities');
+const { getRoutineById, getUserById, updateRoutineActivity, destroyRoutineActivity } = require('../db');
 
 // PATCH /api/routine_activities/:routineActivityId
 router.patch('/:routineActivityId', async (req, res, next) => {
   const { routineActivityId } = req.params;
   const { routineId, activityId, duration, count } = req.body;
+  const prefix = 'Bearer ';
+  const auth = req.header('authorization');
+  const token = auth.slice(prefix.length);
+  const { id } =  jwt.verify(token, JWT_SECRET);
 
   const updateR = {};
 
@@ -21,13 +29,17 @@ router.patch('/:routineActivityId', async (req, res, next) => {
     updateR.count = count;
   }
 
-  try {
-    const originalRoutineActivity = await getRoutineActivityById(req.params);
+  updateR.id = routineActivityId;
 
-    if (originalRoutineActivity.routineActivityId === routineActivityId) {
-      const updatedRoutineActivity = await updateRoutineActivity(routineActivityId, updateR)
-      res.send(updatedRoutineActivity);
-    }
+  try {
+    const originalRoutineActivity = await getRoutineActivityById(routineActivityId);
+    const routine = await getRoutineById(originalRoutineActivity.routineId);
+    const user = await getUserById(id);
+    if (routine.creatorId !== id) {
+      res.send({error: "UserDoesNotMatch", name: "UserDoesNotMatch", message: `User ${user.username} is not allowed to update ${routine.name}`});
+    } 
+    const updatedRoutine = await updateRoutineActivity(updateR);
+    res.send(updatedRoutine);
   } catch ({ name, message }) {
     next({ name, message });
   }
@@ -38,11 +50,24 @@ router.patch('/:routineActivityId', async (req, res, next) => {
 // DELETE /api/routine_activities/:routineActivityId
 router.delete('/:routineActivityId', async (req, res, next) => {
   const { routineActivityId } = req.params;
+
+  const prefix = 'Bearer ';
+  const auth = req.header('authorization');
+  const token = auth.slice(prefix.length);
+  const { id } =  jwt.verify(token, JWT_SECRET);
   try {
-    const routineActivityId = await destroyRoutineActivity(req.params);
-    res.send(routineActivityId);
-  } catch ({ name, message }) {
-    next({ name, message });
+    const routineActivity = await getRoutineActivityById(routineActivityId);
+    const routine = await getRoutineById(routineActivity.routineId);
+    const user = await getUserById(id);
+    if(routine.creatorId === id){
+      await destroyRoutineActivity(routineActivityId);
+    } else {
+      res.status(403);
+      res.send({error:"WrongUser", name:"WrongUser", message:`User ${user.username} is not allowed to delete ${routine.name}`});
+    }
+    res.send(routineActivity);
+  } catch (error) {
+    
   }
 });
 

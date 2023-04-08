@@ -3,6 +3,8 @@ const morgan = require('morgan');
 const express = require("express")
 const app = express()
 const cors = require('cors');
+const PORT = process.env.PORT || 4000;
+const path = require("path"); 
 
 const apiRouter = require("./api")
 
@@ -17,20 +19,13 @@ app.get('/', (req, res) => {
 app.use("/api", apiRouter);
 
 module.exports = app
-const PORT = process.env.PORT || 3000;
-const apiRouter = require("./api")
 app.use("/api", apiRouter)
 app.use(morgan('dev'));
 app.use(express.json());
 
-app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'index.html')));
+// Setup your Middleware and API Router here
 
 app.use('/dist', (express.static(path.join(__dirname, 'dist'))));
-
-app.listen(PORT, (err) => {
-  if (err) console.log("problem with server")
-  console.log("listening on port ${PORT}")
-})
 
 app.use((err, req, res, next) => {
   res.send({
@@ -40,5 +35,9 @@ app.use((err, req, res, next) => {
 })
 
 app.use("/api", apiRouter);
+
+app.use((req, res, next) => {
+  res.status(404).send({message: "Request failed with status code 404"});
+});
 
 module.exports = app;

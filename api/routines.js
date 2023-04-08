@@ -1,13 +1,16 @@
 const express = require('express');
 const routinesRouter = express.Router();
+const jwt = require('jsonwebtoken');
+const { JWT_SECRET } = process.env;
 const { getAllPublicRoutines,
   getAllRoutines,
       createRoutine,
       getRoutineById,
       updateRoutine,
       destroyRoutine,
-      getRoutineActivitiesByRoutineIdActivityIdPair,
-      addActivityToRoutine }  = require('../db/')
+      addActivityToRoutine, 
+      getUserById,
+      getRoutineActivitiesByRoutine}  = require('../db/')
 
 const requireUser = require('./utils')   
 
@@ -22,41 +25,52 @@ routinesRouter.get('/', async (req, res, next) => {
 });
 
 
-routinesRouter.post('/', requireUser, async (req, res, next) => {
-  const { isPublic, name, goal } = req.body;
-  
-  try {
-    const newRoutine = await createRoutine({creatorId: req.user.id, isPublic, name, goal})
-
-    if (newRoutine) {
-      res.send(newRoutine);
-    } else {
-      next({ 
-      name: 'RoutineCreationError', 
-      message: 'Sorry, no routine created'
-      });
+routinesRouter.post('/', async (req, res, next) => {
+  const prefix = 'Bearer ';
+  const auth = req.header('authorization');
+  if(!auth) {
+    res.status(403);
+    res.send({error:"NotLoggedIn", name:"NotLoggedIn", message:"You must be logged in to perform this action"});
+  } else {
+    const token = auth.slice(prefix.length);
+    const { id } =  jwt.verify(token, JWT_SECRET);
+    const { isPublic, name, goal } = req.body;
+    const fields = {
+      creatorId: id,
+      isPublic: isPublic,
+      name: name,
+      goal: goal
     }
-  } catch ({ name, message }) {
+  try {
+    if(id) {
+      const newRoutine = await createRoutine(fields);
+      res.send(newRoutine);
+    } 
+    } catch ({ name, message }) {
     next({ name, message });
   }
+}
 });
 
 
 routinesRouter.post('/:routineId/activities', async (req, res, next) => {
   const { routineId } = req.params;
-  const { activityId, count, duration } = req.body
+  const { activityId, count, duration } = req.body;
 
   try { 
-    const existingPair = await getRoutineActivitiesByRoutineIdActivityIdPair(routineId, activityId)
-    const addedActivity =  await addActivityToRoutine({ routineId, activityId, count, duration })
-  
-    if (addedActivity && !existingPair) {
-      res.send(addedActivity);
+    const routineActExists = await getRoutineActivitiesByRoutine({id: routineId});
+    let exists = false;
+
+    for(let i = 0; i < routineActExists.length; i++) {
+      if (routineActExists[i].activityId === activityId) {
+        exists = true;
+      }
+    }
+    if(exists) {
+      res.send({error: "RoutineActivityDuplicate", name: "RoutineActivityDuplicate", message: `Activity ID ${activityId} already exists in Routine ID ${routineId}`});
     } else {
-      next({ 
-        name: 'AddActivityError', 
-        message: 'Sorry, no routine activity added'
-        });
+        const result = await addActivityToRoutine({routineId, activityId, count, duration});
+        res.send(result);
     }
   } catch ({ name, message }) {
     next({ name, message })
@@ -64,47 +78,57 @@ routinesRouter.post('/:routineId/activities', async (req, res, next) => {
 });
 
 
-routinesRouter.patch('/:routineId', requireUser, async (req, res, next) => {
+routinesRouter.patch('/:routineId', async (req, res, next) => {
   const { routineId } = req.params;
   const { isPublic, name, goal } = req.body;
-
-  try {
-    const routine = await getRoutineById(routineId)
-
-    if (routine.creatorId === req.user.id) {
-      const updatedRoutine = await updateRoutine({id: routine.id, isPublic, name, goal})
-      res.send(updatedRoutine)
-    } else {
-      next({
-        name: 'UnauthorizedUserError',
-        message: 'You cannot update a routine that is not yours'
-      })
+  const prefix = 'Bearer ';
+  const auth = req.header('authorization');
+  if(!auth) {
+    res.status(403);
+    res.send({error:"NotLoggedIn", name:"NotLoggedIn", message:"You must be logged in to perform this action"});
+  } else {
+    const token = auth.slice(prefix.length);
+    const { id } =  jwt.verify(token, JWT_SECRET);
+    try {
+      const user = await getUserById(id);
+      const routine = await getRoutineById(routineId);
+      if(routine.creatorId === id) {
+        const result = await updateRoutine({id, isPublic, name, goal});
+        res.send(result);
+      } else {
+        res.status(403);
+        res.send({error: "UnathorizedChange", name: "UnauthorizedChange", message:`User ${user.username} is not allowed to update ${routine.name}`});
+      }
+    } catch ({name, message}) {
+      next({name, message});
     }
-  } catch ({ name, message }) {
-    next({ name, message });
   }
 });
 
 
-routinesRouter.delete('/:routineId', requireUser, async (req, res, next) => {
+routinesRouter.delete('/:routineId', async (req, res) => {
   const { routineId } = req.params;  
-  const routine = await getRoutineById(routineId)
-
-  try {
-    if (routine && routine.creatorId === req.user.id) {
-      const removedRoutine = await destroyRoutine(routine.id)
-      res.send(removedRoutine);
-    } else {
-      next(routine ? { 
-      name: 'NotAllowed', 
-      message: 'Sorry it was not deleted because you are not the user'
-      } : { 
-      name: 'NotAvailable', 
-      message: 'That routine does not exist'
-      });
+  const prefix = 'Bearer ';
+  const auth = req.header('authorization');
+  if(!auth) {
+    res.status(403);
+    res.send({error:"NotLoggedIn", name:"NotLoggedIn", message:"You must be logged in to perform this action"});
+  } else {
+    const token = auth.slice(prefix.length);
+    const { id } =  jwt.verify(token, JWT_SECRET);
+    try {
+        const user = await getUserById(id);
+        const routine = await getRoutineById(routineId);
+        if(routine.creatorId === id) {
+        const result = await destroyRoutine(routineId);
+        res.send(result);
+        } else {
+          res.status(403);
+          res.send({error: "IncorrectUser", name: "IncorrectUser", message: `User ${user.username} is not allowed to delete ${routine.name}`});
+        }
+    } catch ({name, message}) {
+      next({name, message});
     }
-  } catch ({ name, message }) {
-    next({ name, message })
   }
 });
 

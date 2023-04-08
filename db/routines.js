@@ -39,12 +39,12 @@ async function getAllRoutines() {
 
       for (let routine of routines) {
       const {rows: activities} = await client.query(`
-        SELECT activities.*, routine_activities.duration, routine_activities.count, routine_activities.id as "routineActivityId"
+        SELECT activities.*, routine_activities.duration, routine_activities.count, routine_activities."activityId", routine_activities."routineId", routine_activities.id as "routineActivityId"
         FROM activities 
         JOIN routine_activities ON routine_activities."activityId"=activities.id
         WHERE "routineId" IN ($1)
         `, [routine.id]);
-        routine.activities = activities
+        routine.activities = activities;
       }
 
       return routines;
@@ -78,15 +78,15 @@ async function getAllPublicRoutines() {
         WHERE "isPublic"=true
         `)
 
-      for (let routine of routines) {
-      const {rows: activities} = await client.query(`
-        SELECT activities.*, routine_activities.duration, routine_activities.count, routine_activities.id
-        FROM activities 
-        JOIN routine_activities ON routine_activities."activityId"=activities.id
-        WHERE "routineId" IN ($1)
-        `, [routine.id]);
-        routine.activities = activities
-        }
+        for (let routine of routines) {
+          const {rows: activities} = await client.query(`
+            SELECT activities.*, routine_activities.duration, routine_activities.count, routine_activities."activityId", routine_activities."routineId", routine_activities.id as "routineActivityId"
+            FROM activities 
+            JOIN routine_activities ON routine_activities."activityId"=activities.id
+            WHERE "routineId" IN ($1)
+            `, [routine.id]);
+            routine.activities = activities;
+          }
 
       return routines;
   } catch (error) {
@@ -104,15 +104,15 @@ async function getAllRoutinesByUser({username}) {
         WHERE username='${username}'
         `)
 
-      for (let routine of routines) {
-      const {rows: activities} = await client.query(`
-        SELECT activities.*, routine_activities.duration, routine_activities.count, routine_activities.id as "RoutineActivityId"
-        FROM activities 
-        JOIN routine_activities ON routine_activities."activityId"=activities.id
-        WHERE "routineId" IN ($1)
-        `, [routine.id]);
-        routine.activities = activities
-      }
+        for (let routine of routines) {
+          const {rows: activities} = await client.query(`
+            SELECT activities.*, routine_activities.duration, routine_activities.count, routine_activities."activityId", routine_activities."routineId", routine_activities.id as "routineActivityId"
+            FROM activities 
+            JOIN routine_activities ON routine_activities."activityId"=activities.id
+            WHERE "routineId" IN ($1)
+            `, [routine.id]);
+            routine.activities = activities;
+          }
 
       return routines;
   } catch(error) {
@@ -130,17 +130,15 @@ async function getPublicRoutinesByUser({username}) {
         WHERE username='${username}' AND "isPublic"=true
         `)
   
-      for (let routine of routines) {
-      const {rows: activities} = await client.query(`
-        SELECT activities.*, routine_activities.duration, routine_activities.count, routine_activities.id
-        FROM activities 
-        JOIN routine_activities ON routine_activities."activityId"=activities.id
-        WHERE "routineId" IN ($1)
-        `, [routine.id]);
-        routine.activities = activities
-        console.log("ROUTINE", routine);
-      }
-      console.log("ROUTINES", routines);
+        for (let routine of routines) {
+          const {rows: activities} = await client.query(`
+            SELECT activities.*, routine_activities.duration, routine_activities.count, routine_activities."activityId", routine_activities."routineId", routine_activities.id as "routineActivityId"
+            FROM activities 
+            JOIN routine_activities ON routine_activities."activityId"=activities.id
+            WHERE "routineId" IN ($1)
+            `, [routine.id]);
+            routine.activities = activities;
+          }
       return routines;
   } catch(error) {
     throw error;
@@ -191,7 +189,16 @@ async function getPublicRoutinesByActivity({activityId}) {
 
 
 async function updateRoutine({ id, isPublic, name, goal }) {
-const fields  = { isPublic, name, goal }
+  let fields  = { isPublic, name, goal };
+  if(isPublic === undefined) {
+    delete fields.isPublic;
+  } 
+  if(!name) {
+    delete fields.name;
+  } 
+  if(!goal) {
+    delete fields.goal;
+  }
 
   const setString = Object.keys(fields).map(
     (key, index) => `"${ key }"=$${ index + 1 }`
@@ -208,10 +215,6 @@ const fields  = { isPublic, name, goal }
       WHERE id=${ id }
       RETURNING *;
     `, Object.values(fields));
-
-    if (isPublic === undefined) {
-      routine.isPublic = false
-    }
 
     return routine;
   } catch (error) {

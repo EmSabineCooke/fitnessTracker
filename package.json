@@ -9,7 +9,8 @@
     "start:dev": "nodemon server.js",
     "start": "node server.js",
     "test": "jest --runInBand",
-    "test:watch": "jest --runInBand --watchAll"
+    "test:watch": "jest --runInBand --watchAll",
+    "build:dev": "webpack --watch --mode=development"
   },
   "repository": {
     "type": "git",
@@ -29,6 +30,9 @@
   },
   "homepage": "https://github.com/wallacepreston/fitnesstrackr#readme",
   "devDependencies": {
+    "@babel/core": "^7.21.4",
+    "@babel/preset-react": "^7.18.6",
+    "babel-loader": "^9.1.2",
     "eslint": "^8.2.0",
     "eslint-plugin-jest": "^25.2.4",
     "html-webpack-plugin": "^5.5.0",
@@ -41,6 +45,7 @@
   "dependencies": {
     "axios": "^0.19.2",
     "bcrypt": "^5.1.0",
+    "browser-router": "^0.2.0",
     "chalk": "^4.0.0",
     "cors": "^2.8.5",
     "dotenv": "^8.2.0",
@@ -51,6 +56,8 @@
     "morgan": "^1.10.0",
     "pg": "^8.2.1",
     "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "react-dom": "^18.2.0",
+    "react-router": "^6.10.0",
+    "react-router-dom": "^6.10.0"
   }
 }

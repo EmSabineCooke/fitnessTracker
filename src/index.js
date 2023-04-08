@@ -1,14 +1,14 @@
-import React, { useState } from "react";
+import React from 'react';
+import ReactDOM from 'react-dom';
+import { BrowserRouter } from "react-router-dom";
 import { createRoot } from 'react-dom/client';
-import { HashRouter, Routes, Route } from "react-router-dom";
-import SideNav from "./components/SideNav";
-import Redirecter from "./components/Redirecter";
-import Dashboard from "./components/Dashboard";
-import Register from "./components/Register";
-import Community from "./components/Community";
-import Profile from "./components/Profile";
-import Settings from "./components/Settings";
-import Login from "./components/Login";
+import { HashRouter, Routes, Route } from "react-router";
+import HomeScreen from "./components/HomeScreen.js";
+import Register from "./components/Register.js";
+import Profile from "./components/Profile.js";
+import Login from "./components/Login.js";
+import Navigate from "./components/Navigate.js"
+// import "./index.css";
 
 const App = () => {
 
@@ -17,7 +17,7 @@ const App = () => {
 
   return (
     <div>
-
+      <div>Howdy do</div>
       <SideNav loginOut={loginOut} setLoginOut={setLoginOut} />
       <Routes>
         <Route path="/" element={<Redirecter />} />
