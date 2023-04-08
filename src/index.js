@@ -7,18 +7,21 @@ import HomeScreen from "./components/HomeScreen.js";
 import Register from "./components/Register.js";
 import Profile from "./components/Profile.js";
 import Login from "./components/Login.js";
-import Search from "./components/Searchbar.js"
-// import "./index.css";
+import Navigate from "./components/Navigate";
+
+// import "./Activities.css";
 
 const App = () => {
   return (
     <div id="app">
+      <Navigate />
       <Routes>
         <Route path="/" element={<HomeScreen />} />
         <Route path='/register' element={<Register />} />
         <Route path='/login' element={<Login />} />
         <Route path='/profile' element={<Profile />} />
-        <Route path="/Search" element={<Search />} />
+        <Route path="/routines" element={<Routines />} />
+        <Route path="/activities" element={<Activities />} />
       </Routes>
 
     </div>
