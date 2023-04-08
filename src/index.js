@@ -3,22 +3,19 @@ import ReactDOM from 'react-dom';
 import { BrowserRouter } from "react-router-dom";
 import { createRoot } from 'react-dom/client';
 import { HashRouter, Routes, Route } from "react-router";
-// import HomeScreen from "./components/HomeScreen.js";
-// import Register from "./components/Register.js";
-// import Profile from "./components/Profile.js";
-// import Login from "./components/Login.js";
-// import Navigate from "./components/Navigate.js"
-// import "./index.css";
+import HomeScreen from "./components/HomeScreen.js";
+import Register from "./components/Register.js";
+import Profile from "./components/Profile.js";
+import Login from "./components/Login.js";
+import Navigate from "./components/Navigate.js"
+import "./index.css"
 
 const App = () => {
 
-  // const [loginOut, setLoginOut] = useState("");
-
+  console.log("hello world")
 
   return (
-    <div>
-      Howdy do
-      {/* <SideNav loginOut={loginOut} setLoginOut={setLoginOut} />
+    <div id="app">
       <Routes>
         <Route path="/" element={<Redirecter />} />
         <Route path='/register' element={<Register setLoginOut={setLoginOut} />} />
@@ -28,8 +25,7 @@ const App = () => {
         <Route path='/community' element={<Community />} />
         <Route path='/settings' element={<Settings />} />
 
-      </Routes> */}
-
+      </Routes>
     </div>
   )
 };
