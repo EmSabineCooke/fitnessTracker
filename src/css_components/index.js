@@ -1,37 +1,42 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
-import React from "react";
-import ReactDOM from "react-dom/client";
-import { BrowserRouter } from "react-router-dom";
+import React, { useState } from "react";
 import { createRoot } from 'react-dom/client';
 import { HashRouter, Routes, Route } from "react-router-dom";
-import HomeScreen from "./components/HomeScreen.js";
-import Register from "./components/Register.js";
-import Profile from "./components/Profile.js";
-import Login from "./components/Login.js";
-import Search from "./components/Search.js"
-import "./index.css";
+import SideNav from "./components/SideNav";
+import Redirecter from "./components/Redirecter";
+import Dashboard from "./components/Dashboard";
+import Register from "./components/Register";
+import Community from "./components/Community";
+import Profile from "./components/Profile";
+import Settings from "./components/Settings";
+import Login from "./components/Login";
 
 const App = () => {
+
+  const [loginOut, setLoginOut] = useState("");
+
+
   return (
-    <div id="app">
+    <div>
+
+      <SideNav loginOut={loginOut} setLoginOut={setLoginOut} />
       <Routes>
-        <Route path="/" element={<HomeScreen />} />
-        <Route path='/register' element={<Register />} />
-        <Route path='/login' element={<Login />} />
+        <Route path="/" element={<Redirecter />} />
+        <Route path='/register' element={<Register setLoginOut={setLoginOut} />} />
+        <Route path='/login' element={<Login setLoginOut={setLoginOut} />} />
+        <Route path='/dashboard' element={<Dashboard />} />
         <Route path='/profile' element={<Profile />} />
-        <Route path="/Search" element={<Search />} />
+        <Route path='/community' element={<Community />} />
+        <Route path='/settings' element={<Settings />} />
+
       </Routes>
 
     </div>
   )
 };
 
-ReactDOM.createRoot(
-  <h1>Fitness Tracker</h1>,
-  document.getElementById('root')).render(
-    < React.StrictMode >
-      <BrowserRouter>
-        <App />
-      </BrowserRouter>
-    </React.StrictMode >)
+const container = document.getElementById('root');
+const root = createRoot(container)
+root.render(<HashRouter>
+  <App />
+</HashRouter>
+);
