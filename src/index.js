@@ -19,7 +19,7 @@ const App = () => {
         <Route path='/login' element={<Login />} />
         <Route path='/profile' element={<Profile />} />
         <Route path="/routines" element={<Routines />} />
-        {/* <Route path="/activities" element={<Activities />} />  */}
+        <Route path="/activities" element={<Activities />} />
       </Routes>
     </React.Fragment>
   )
