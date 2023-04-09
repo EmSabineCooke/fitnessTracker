@@ -8,6 +8,7 @@ import Login from "./components/Login.js";
 import Navigate from "./components/Navigate";
 import HomePage from "./components/Home.js"
 import Routines from "./components/Routines.js"
+import Activities from "./components/Activities.js"
 // import "./Activities.css";
 
 const App = () => {
@@ -19,7 +20,7 @@ const App = () => {
         <Route path='/login' element={<Login />} />
         <Route path='/profile' element={<Profile />} />
         <Route path="/routines" element={<Routines />} />
-        {/* <Route path="/activities" element={<Activities />} />  */}
+        <Route path="/activities" element={<Activities />} />
       </Routes>
     </React.Fragment>
   )
