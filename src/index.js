@@ -8,7 +8,6 @@ import Login from "./components/Login.js";
 import Navigate from "./components/Navigate";
 import HomePage from "./components/Home.js"
 import Routines from "./components/Routines.js"
-import Activities from "./components/Activities.js"
 // import "./Activities.css";
 
 const App = () => {
