@@ -1,0 +1,127 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+  
+  header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 110px;
+    z-index: 1000;
+    background-color: #1E90FF;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 2em;
+  }
+  
+  .logo {
+    font-size: 2rem;
+    letter-spacing: 0.5em;
+    color: #FFFFFF;
+  }
+  
+  .headerlinks {
+    display: flex;
+    justify-content: center;
+  }
+  
+  .headerlinks > .btn {
+    margin: 0 1em;
+    background-color: #FFFFFF;
+    color: #1E90FF;
+    border: none;
+    padding: .5em 1em;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+  
+  .headerlinks > .btn:hover {
+    background-color: #1E90FF;
+    color: #FFFFFF;
+  }
+  
+  .main {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 70px;
+    min-height: calc(100vh - 110px);
+    z-index: 0;
+    background-color: #FFFFFF;
+    padding: 2em;
+  }
+  
+  .routines,
+  .activities,
+  .edit-routine-form,
+  .edit-routine-details-form,
+  .add-activity-form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .routine-card,
+  .activity-card,
+  .edit-routine-form > .routine-activity-card {
+    width: 80vw;
+    margin: 2em 0;
+    background-color: #1E90FF;
+    color: #FFFFFF;
+    padding: 1em;
+    border-radius: 8px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.15);
+  }
+  
+  .routine-card h2,
+  .activity-card h2,
+  .edit-routine-form > .routine-activity-card h2 {
+    font-size: 1.5rem;
+    margin-bottom: 1em;
+  }
+  
+  .activity-select,
+  .edit-routine-button {
+    margin-top: 1em;
+    background-color: #FFFFFF;
+    color: #1E90FF;
+    border: none;
+    padding: .5em 1em;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+  
+  .activity-select:hover,
+  .edit-routine-button:hover {
+    background-color: #1E90FF;
+    color: #FFFFFF;
+  }
+  
+  .delete-routine-button {
+    margin-top: 1em;
+    background-color: #DC143C;
+    color: #FFFFFF;
+    border: none;
+    padding: .5em 1em;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+  
+  .delete-routine-button:hover {
+    background-color: #FF4500;
+  }
+  
+  .quote {
+    width: 50%;
+    height: 50%;
+    border: 5px solid #1E90FF;
+    margin-top: 2em;
+  }
+  
