@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from "react";
+import React, {useState} from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 
@@ -11,20 +11,18 @@ const Login = () => {
 
     const handleLogin = async (event) => {
         event.preventDefault();
-        useEffect( () => {
-            const getLogin = async () => {
+        try{
                 const response = await axios.post('/api/users/login', {username: userName, password: password});
-                console.log("response", response)
-                if(response.success) {
-                    window.localStorage.setItem("Fitness-Trackr-Login", result.data.token);
-                    console.log("Login Successful");
+                if(response.data.message === "you're logged in!") {
+                    window.localStorage.setItem("Fitness-Trackr-Login", response.data.token);
                     setMessage("Login Successful");
-                    // navigate("/");
-                    // window.location.reload(false);
+                    navigate("/");
+                    window.location.reload(false);
             }
+        } catch(error) {
+            console.error(error);
         }
-        getLogin();
-    }, []);
+    }
 
     return (
         <div id="register-form">
@@ -36,7 +34,6 @@ const Login = () => {
             </form>
         </div>
     )
-    }
 }
 
 export default Login;
