@@ -1,20 +1,24 @@
 import React, { useState } from "react";
 import Axios from "axios";
+import { useNavigate } from "react-router";
 
 const RegisterForm = () => {
     const [userName, setUserName] = useState("");
     const [password, setPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
     const [message, setMessage] = useState("");
+    const navigate = useNavigate();
+
     const handleRegister = async () => {
         if (password.length < 6 || confirmPassword.length < 6) {
             setMessage("Passwords must be at least 6 characters long.")
         }
         if (password === confirmPassword) {
             try {
-                const response = await Axios.get('/api/users/register', { username: userName, password: password });
-                if (response.success) {
-                    window.localStorage.setItem("Fitness-Trackr-Login", result.data.token);
+                const response = await Axios.post('/api/users/register', { username: userName, password: password });
+                console.log(response);
+                if (response.data.message === "Sign up was successful") {
+                    window.localStorage.setItem("Fitness-Trackr-Login", response.data.token);
                     console.log("Login Successful");
                     setMessage("Login Successful");
                     navigate("/");
@@ -22,12 +26,7 @@ const RegisterForm = () => {
                 }
             } catch (error) {
                 console.error(error);
-            }
-            if (window.localStorage.getItem("Fitness-Trackr-Login")) {
-                setMessage("You have successfully registered!");
-            } else {
-                setMessage("Something went wrong.");
-            }
+            } 
         } else {
             setMessage("Passwords don't match. Try again.")
         }
